@@ -5,6 +5,7 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import cors from '@koa/cors';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -46,6 +47,26 @@ router.post('/sign-up', async (ctx: Context) => {
     ctx.body = 'Error registering user';
   }
 });
+
+router.post('/sign-in', async (ctx: Context) => {
+    const { email, password } = ctx.request.body as { email: string, password: string };
+    if (!email || !password) {
+      ctx.status = 400; ctx.body = 'All fields are required';
+      return;
+    } try {
+        const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        const user = (rows as any[])[0];
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            ctx.status = 401;
+            ctx.body = 'Invalid email or password';
+            return; }
+            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
+            ctx.status = 200; ctx.body = { token };
+        } catch (err) {
+            console.error('Error signing in:', err);
+            ctx.status = 500; ctx.body = 'Error signing in';
+        }
+    });
 
 app
   .use(router.routes())

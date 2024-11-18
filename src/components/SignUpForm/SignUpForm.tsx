@@ -1,6 +1,6 @@
 import { Button, Card, Container } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import axios from 'axios';
 
@@ -8,12 +8,15 @@ const SignUpForm = () => {
     const [username, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         try {
-            await axios.post('http://localhost:5000/sign-up', { username, email, password });
+            const response = await axios.post('http://localhost:5000/sign-up', { username, email, password });
             console.log('User registered successfully');
+            localStorage.setItem('authToken', response.data.token);
+            navigate('/main');
         } catch (err) {
             console.log('Error registering user');
         }
