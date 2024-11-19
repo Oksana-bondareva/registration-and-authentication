@@ -68,6 +68,16 @@ router.post('/sign-in', async (ctx: Context) => {
         }
     });
 
+router.get('/users', async (ctx: Context) => {
+    try { const [rows] = await db.query('SELECT id, username, email, status, last_login FROM users');
+        ctx.body = rows;
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        ctx.status = 500;
+        ctx.body = 'Error fetching users';
+    }
+});
+
 app
   .use(router.routes())
   .use(router.allowedMethods());

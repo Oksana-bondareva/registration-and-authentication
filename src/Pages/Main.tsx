@@ -1,7 +1,9 @@
+import UsersTable from "../components/UsersTable/UsersTable";
+
 const Main = () => {
     return (
       <>
-          <h1>Main Page</h1>
+          < UsersTable/ >
       </>
     )
 }
