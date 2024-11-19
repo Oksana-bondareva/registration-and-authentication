@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Container, Form } from 'react-bootstrap';
+import { Table, Container, Form, Button, ButtonGroup } from 'react-bootstrap';
 
 interface User {
     id: number;
@@ -10,7 +10,7 @@ interface User {
     last_login: Date;
 }
 
-const UsersTable = () => {
+const Main = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
 
@@ -43,17 +43,68 @@ const UsersTable = () => {
         }
     };
 
+    const handleBlockUsers = async () => {
+        try {
+            await axios.put('http://localhost:5000/users/block', { ids: selectedUsers });
+            setUsers(users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'blocked' } : user));
+            setSelectedUsers([]);
+        } catch (err) {
+            console.error('Error blocking users:', err);
+        }
+    };
+
+    const handleUnblockUsers = async () => {
+        try {
+            await axios.put('http://localhost:5000/users/unblock', { ids: selectedUsers });
+            setUsers(users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'active' } : user));
+            setSelectedUsers([]);
+        } catch (err) {
+            console.error('Error unblocking users:', err);
+        }
+    };
+
+    const handleDeleteUsers = async () => {
+        try {
+            await axios.delete('http://localhost:5000/users/delete', { data: { ids: selectedUsers } });
+            setUsers(users.filter(user => !selectedUsers.includes(user.id)));
+            setSelectedUsers([]);
+        } catch (err) {
+            console.error('Error deleting users:', err);
+        }
+    };
+
+    const allSelectedBlocked = selectedUsers.every(userId => {
+        const user = users.find(user => user.id === userId);
+        return user?.status === 'blocked';
+    });
+
+    const allSelectedActive = selectedUsers.every(userId => {
+        const user = users.find(user => user.id === userId);
+        return user?.status === 'active';
+    });
+
     return (
         <Container>
             <h1 className="my-4 text-center">User List</h1>
-            <Table striped bordered hover className='table-primary'>
+            <ButtonGroup className="mb-3">
+                <Button variant="danger" onClick={handleBlockUsers} disabled={!selectedUsers.length || allSelectedBlocked}>
+                    Block
+                </Button>
+                <Button variant="success" onClick={handleUnblockUsers} disabled={!selectedUsers.length || allSelectedActive}>
+                    Unblock
+                </Button>
+                <Button variant="secondary" onClick={handleDeleteUsers} disabled={!selectedUsers.length}>
+                    Delete
+                </Button>
+            </ButtonGroup>
+            <Table striped bordered hover responsive className="table-primary">
                 <thead className="table-dark">
                     <tr>
                         <th>
                             <Form.Check
-                            type="checkbox"
-                            onChange={handleSelectAll}
-                            checked={selectedUsers.length === users.length}
+                                type="checkbox"
+                                onChange={handleSelectAll}
+                                checked={selectedUsers.length === users.length}
                             />
                         </th>
                         <th>ID</th>
@@ -65,12 +116,12 @@ const UsersTable = () => {
                 </thead>
                 <tbody>
                     {users.map(user => (
-                        <tr key={user.id}>
+                        <tr key={user.id} className={user.status === 'blocked' ? 'table-danger' : ''}>
                             <td>
                                 <Form.Check
-                                type="checkbox"
-                                checked={selectedUsers.includes(user.id)}
-                                onChange={() => handleSelectUser(user.id)}
+                                    type="checkbox"
+                                    checked={selectedUsers.includes(user.id)}
+                                    onChange={() => handleSelectUser(user.id)}
                                 />
                             </td>
                             <td>{user.id}</td>
@@ -86,4 +137,4 @@ const UsersTable = () => {
     );
 };
 
-export default UsersTable;
+export default Main;

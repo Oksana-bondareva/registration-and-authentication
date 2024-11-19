@@ -62,11 +62,11 @@ router.post('/sign-in', async (ctx: Context) => {
             return; }
             const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
             ctx.status = 200; ctx.body = { token };
-        } catch (err) {
-            console.error('Error signing in:', err);
-            ctx.status = 500; ctx.body = 'Error signing in';
-        }
-    });
+    } catch (err) {
+        console.error('Error signing in:', err);
+        ctx.status = 500; ctx.body = 'Error signing in';
+    }
+});
 
 router.get('/users', async (ctx: Context) => {
     try { const [rows] = await db.query('SELECT id, username, email, status, last_login FROM users');
@@ -75,6 +75,55 @@ router.get('/users', async (ctx: Context) => {
         console.error('Error fetching users:', err);
         ctx.status = 500;
         ctx.body = 'Error fetching users';
+    }
+});
+
+router.put('/users/block', async (ctx: Context) => {
+    const { ids } = ctx.request.body as { ids: number[] };
+    try {
+        await db.query('UPDATE users SET status = ? WHERE id IN (?)', ['blocked', ids]);
+        ctx.status = 200;
+        ctx.body = 'Users blocked successfully';
+    } catch (err) {
+        console.error('Error blocking users:', err);
+        ctx.status = 500; ctx.body = 'Error blocking users';
+    }
+});
+
+router.put('/users/unblock', async (ctx: Context) => {
+    const { ids } = ctx.request.body as { ids: number[] };
+    try {
+        await db.query('UPDATE users SET status = ? WHERE id IN (?)', ['active', ids]);
+        ctx.status = 200;
+        ctx.body = 'Users unblocked successfully';
+    } catch (err) {
+        console.error('Error unblocking users:', err);
+        ctx.status = 500; ctx.body = 'Error unblocking users';
+    }
+});
+
+router.delete('/users/delete', async (ctx: Context) => {
+    const { ids } = ctx.request.body as { ids: number[] };
+    try {
+        await db.query('DELETE FROM users WHERE id IN (?)', [ids]);
+        ctx.status = 200;
+        ctx.body = 'Users deleted successfully';
+    } catch (err) {
+        console.error('Error deleting users:', err);
+        ctx.status = 500; ctx.body = 'Error deleting users';
+    }
+});
+
+router.put('/users/block', async (ctx: Context) => {
+    const { ids } = ctx.request.body as { ids: number[] };
+    try {
+        await db.query('UPDATE users SET status = ? WHERE id IN (?)', ['blocked', ids]);
+        ctx.status = 200;
+        ctx.body = 'Users blocked successfully';
+    } catch (err) {
+        console.error('Error blocking users:', err);
+        ctx.status = 500;
+        ctx.body = 'Error blocking users';
     }
 });
 
