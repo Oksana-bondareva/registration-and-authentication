@@ -11,12 +11,17 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     const authToken = localStorage.getItem('authToken');
-    return authToken ? children : <Navigate to="/sign-in" />;
+    const allUsersBlocked = localStorage.getItem('allUsersBlocked') === 'true';
+    if (!authToken || allUsersBlocked) { 
+        return <Navigate to="/sign-in" />;
+    }
+    return <>{children}</>;
 };
 
 const loader = async () => {
     const authToken = localStorage.getItem('authToken');
-    if (authToken) {
+    const allUsersBlocked = localStorage.getItem('allUsersBlocked') === 'true';
+    if (authToken && !allUsersBlocked) {
         throw redirect('/main');
     }
     return null;
@@ -29,7 +34,7 @@ export const router = createBrowserRouter([
       children: [
         {
           index: true,
-          element: <Navigate replace to={'main'} />,
+          element: <Navigate replace to={'/sign-in'} />,
         },
         { path: '/main', element: (
             <PrivateRoute>

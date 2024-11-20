@@ -15,6 +15,7 @@ const SignUpForm = () => {
         try {
             const response = await axios.post('http://localhost:5000/sign-up', { username, email, password });
             console.log('User registered successfully');
+            localStorage.removeItem('allUsersBlocked');
             localStorage.setItem('authToken', response.data.token);
             navigate('/main');
         } catch (err) {

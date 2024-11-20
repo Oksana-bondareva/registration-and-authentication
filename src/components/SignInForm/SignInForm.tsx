@@ -14,6 +14,7 @@ const SignInForm = () => {
         event.preventDefault();
         try { const response = await axios.post('http://localhost:5000/sign-in', { email, password });
             console.log('User signed in successfully');
+            localStorage.removeItem('allUsersBlocked');
             localStorage.setItem('authToken', response.data.token);
             navigate('/main');
         } catch (err) {
