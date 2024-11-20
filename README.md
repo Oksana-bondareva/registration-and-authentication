@@ -1,50 +1,19 @@
-# React + TypeScript + Vite
+# Registration and Authentication System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+This project is a comprehensive registration and authentication system built using modern web technologies. It is designed to provide a secure and user-friendly interface for users to sign up, log in, and manage their accounts. The system includes features such as user registration, login, account blocking/unblocking, and deletion, with robust error handling and visual feedback using toast notifications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+* User Registration: Users can register by providing a username, email, and password. The system ensures that email addresses are unique and securely stores passwords using bcrypt.
+* User Login: Registered users can log in using their email and password. The system verifies the credentials and generates a JWT token for authenticated sessions.
+* Account Management: Admins can block, unblock, and delete user accounts. Blocked users cannot log in until their account is unblocked.
+* Error Handling: Comprehensive error handling for various scenarios, including duplicate email registration, invalid credentials, and network errors, with feedback provided through toast notifications.
+* Responsive Design: The UI is built using React and Bootstrap, ensuring responsiveness and a seamless user experience across different devices.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Technologies Used
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+* Frontend: React, Bootstrap, React-Router-Dom, React-Toastify
+* Backend: Koa, Koa-Router, Koa-Bodyparser, Koa-Cors, bcrypt, jsonwebtoken, MySQL
+* Build Tools: Vite, TypeScript
