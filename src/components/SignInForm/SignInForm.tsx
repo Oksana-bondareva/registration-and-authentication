@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignInForm = () => {
     const [email, setEmail] = useState('');
@@ -12,18 +14,22 @@ const SignInForm = () => {
 
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
-        try { const response = await axios.post('http://localhost:5000/sign-in', { email, password });
-            console.log('User signed in successfully');
+        try {
+            const response = await axios.post('http://localhost:5000/sign-in', { email, password });
             localStorage.removeItem('allUsersBlocked');
             localStorage.setItem('authToken', response.data.token);
-            navigate('/main');
+            toast.success('User signed in successfully');
+            setTimeout(() => {
+                navigate('/main');
+            }, 1000);
         } catch (err) {
-            console.error(err); alert('Error signing in');
+            toast.error('Error authentication user. Please enter the correct email and password.');
         }
     };
 
     return (
-        <Container>
+        <Container className="bg-light p-5">
+            <ToastContainer />
             <Card className="my-5 px-5 py-3">
                 <h1 className="m-3 text-center">Sign in</h1>
                 <Form onSubmit={handleSubmit}>

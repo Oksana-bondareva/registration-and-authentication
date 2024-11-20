@@ -3,6 +3,8 @@ import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignUpForm = () => {
     const [username, setUserName] = useState('');
@@ -14,17 +16,20 @@ const SignUpForm = () => {
         event.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/sign-up', { username, email, password });
-            console.log('User registered successfully');
             localStorage.removeItem('allUsersBlocked');
             localStorage.setItem('authToken', response.data.token);
-            navigate('/main');
+            toast.success('User registered successfully');
+            setTimeout(() => {
+                navigate('/main');
+            }, 1000);
         } catch (err) {
-            console.log('Error registering user');
+            toast.error('This user already exists');
         }
     };
 
     return (
-        <Container>
+        <Container className="bg-light p-5">
+            <ToastContainer />
             <Card className="my-5 px-5 py-3">
                 <h1 className="m-3 text-center">Sign up</h1>
                 <Form onSubmit={handleSubmit}>

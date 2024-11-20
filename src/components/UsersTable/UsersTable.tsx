@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Table, Container, Form, Button, ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './UsersTable.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface User {
     id: number;
@@ -83,7 +85,7 @@ const UsersTable = () => {
                 navigate('/sign-in');
             }
         } catch (err) {
-            console.error('Error blocking users:', err);
+            toast.error('Error blocking users');
         }
     };
 
@@ -95,7 +97,7 @@ const UsersTable = () => {
             setSelectedUsers([]);
             localStorage.removeItem('allUsersBlocked');
         } catch (err) {
-            console.error('Error unblocking users:', err);
+            toast.error('Error unblocking users');
         }
     };
 
@@ -106,7 +108,7 @@ const UsersTable = () => {
             setUsers(updatedUsers);
             setSelectedUsers([]);
         } catch (err) {
-            console.error('Error deleting users:', err);
+            toast.error('Error deleting users');
         }
     };
 
@@ -128,6 +130,7 @@ const UsersTable = () => {
 
     return (
         <Container className="main-container">
+            <ToastContainer />
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>User List</h1>
                 <Button variant="outline-dark" onClick={handleLogout}>
