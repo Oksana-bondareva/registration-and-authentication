@@ -2,9 +2,9 @@ import { Button, Card, Container } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from 'react';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const SignUpForm = () => {
     const [username, setUserName] = useState('');
@@ -22,8 +22,15 @@ const SignUpForm = () => {
             setTimeout(() => {
                 navigate('/main');
             }, 1000);
-        } catch (err) {
-            toast.error('This user already exists');
+        } catch (err: any) {
+            console.error('Error registering user:', err);
+            if (!err.response) {
+                toast.error('No connection to the server. Please try again later.');
+            } else if (err.errno = 1062) {
+                toast.error('Email already in use');
+            } else {
+                toast.error('An unexpected error occurred. Please try again.');
+            }
         }
     };
 

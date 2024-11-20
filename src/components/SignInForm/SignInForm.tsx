@@ -22,7 +22,10 @@ const SignInForm = () => {
             setTimeout(() => {
                 navigate('/main');
             }, 1000);
-        } catch (err) {
+        } catch (err: any) {
+            if (!err.response) {
+                toast.error('No connection to the server. Please try again later.');
+            }
             toast.error('Error authentication user. Please enter the correct email and password.');
         }
     };
