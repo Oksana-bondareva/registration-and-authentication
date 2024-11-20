@@ -92,6 +92,12 @@ const UsersTable = () => {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('allUsersBlocked');
+        navigate('/sign-in');
+    };
+
     const allSelectedBlocked = selectedUsers.every(userId => {
         const user = users.find(user => user.id === userId);
         return user?.status === 'blocked';
@@ -104,7 +110,12 @@ const UsersTable = () => {
 
     return (
         <Container>
-            <h1 className="my-4 text-center">User List</h1>
+            <div className="d-flex justify-content-between align-items-center my-4">
+                <h1>User List</h1>
+                <Button variant="outline-dark" onClick={handleLogout}>
+                    Logout
+                </Button>
+            </div>
             <ButtonGroup className="mb-3">
                 <Button variant="danger" onClick={handleBlockUsers} disabled={!selectedUsers.length || allSelectedBlocked}>
                     Block
