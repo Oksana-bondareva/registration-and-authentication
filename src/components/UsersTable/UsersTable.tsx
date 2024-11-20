@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Container, Form, Button, ButtonGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import './UsersTable.css';
 
 interface User {
     id: number;
@@ -14,6 +15,8 @@ interface User {
 const UsersTable = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [filter, setFilter] = useState<string>('');
     const navigate = useNavigate();
 
     const fetchUsers = async (): Promise<User[]> => {
@@ -34,6 +37,21 @@ const UsersTable = () => {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        filterUsers();
+    }, [filter, users]);
+
+    const filterUsers = () => {
+        let newFilteredUsers = users;
+        if (filter) {
+            newFilteredUsers = users.filter(user => user.email.includes(filter) || user.status.includes(filter) );
+        } setFilteredUsers(newFilteredUsers);
+    };
+
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFilter(event.target.value);
+    };
 
     const handleSelectAll = () => {
         if (selectedUsers.length === users.length) {
@@ -109,7 +127,7 @@ const UsersTable = () => {
     });
 
     return (
-        <Container>
+        <Container className="main-container">
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h1>User List</h1>
                 <Button variant="outline-dark" onClick={handleLogout}>
@@ -127,6 +145,7 @@ const UsersTable = () => {
                     Delete
                 </Button>
             </ButtonGroup>
+            <Form.Group controlId="filter"> <Form.Label>Filter by Email or Status</Form.Label> <Form.Control type="text" placeholder="Enter email or status" value={filter} onChange={handleFilterChange} /> </Form.Group>
             <Table striped bordered hover responsive className="table-primary">
                 <thead className="table-dark">
                     <tr>
@@ -145,7 +164,7 @@ const UsersTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map(user => (
+                    {filteredUsers.map(user => (
                         <tr key={user.id} className={user.status === 'blocked' ? 'table-danger' : ''}>
                             <td>
                                 <Form.Check
