@@ -2,11 +2,11 @@
   "name": "registration and authentication",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc",
-    "start-server": "node dist/Server/server.js",
-    "start-server-ts": "ts-node src/server/server.ts",
+    "build": "vite build",
+    "start-server-ts": "ts-node src/Server/server.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "preview": "vite preview"
