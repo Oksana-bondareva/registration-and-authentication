@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "start": "ts-node src/Server/server.ts",
+    "build": "tsc",
+    "start": "npm run build && node dist/Server/server.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "preview": "vite preview"
