@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start-server-ts": "ts-node src/Server/server.ts",
+    "start": "ts-node src/Server/server.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "preview": "vite preview"
