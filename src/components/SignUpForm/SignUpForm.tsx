@@ -15,7 +15,7 @@ const SignUpForm = () => {
     const handleSubmit = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/sign-up', { username, email, password });
+            const response = await axios.post('https://registration-and-authentication-1.onrender.com/sign-up', { username, email, password });
             localStorage.removeItem('allUsersBlocked');
             localStorage.setItem('authToken', response.data.token);
             toast.success('User registered successfully');

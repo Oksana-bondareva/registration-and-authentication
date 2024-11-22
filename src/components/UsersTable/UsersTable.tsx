@@ -23,7 +23,7 @@ const UsersTable = () => {
 
     const fetchUsers = async (): Promise<User[]> => {
         try {
-            const response = await axios.get<User[]>('http://localhost:5000/users');
+            const response = await axios.get<User[]>('https://registration-and-authentication-1.onrender.com/users');
             return response.data;
         } catch (err) {
             console.error('Error fetching users:', err);
@@ -73,7 +73,7 @@ const UsersTable = () => {
 
     const handleBlockUsers = async () => {
         try {
-            await axios.put('http://localhost:5000/users/block', { ids: selectedUsers });
+            await axios.put('https://registration-and-authentication-1.onrender.com/users/block', { ids: selectedUsers });
             const updatedUsers = users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'blocked' } : user);
             setUsers(updatedUsers);
             setSelectedUsers([]);
@@ -91,7 +91,7 @@ const UsersTable = () => {
 
     const handleUnblockUsers = async () => {
         try {
-            await axios.put('http://localhost:5000/users/unblock', { ids: selectedUsers });
+            await axios.put('https://registration-and-authentication-1.onrender.com/users/unblock', { ids: selectedUsers });
             const updatedUsers = users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'active' } : user);
             setUsers(updatedUsers);
             setSelectedUsers([]);
@@ -103,7 +103,7 @@ const UsersTable = () => {
 
     const handleDeleteUsers = async () => {
         try {
-            await axios.delete('http://localhost:5000/users/delete', { data: { ids: selectedUsers } });
+            await axios.delete('https://registration-and-authentication-1.onrender.com/users/delete', { data: { ids: selectedUsers } });
             const updatedUsers = users.filter(user => !selectedUsers.includes(user.id));
             setUsers(updatedUsers);
             setSelectedUsers([]);
