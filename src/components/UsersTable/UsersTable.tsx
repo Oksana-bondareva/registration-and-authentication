@@ -7,16 +7,15 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface User {
-    id: number;
-    username: string;
     email: string;
+    username: string;
     status: string;
     last_login: Date;
 }
 
 const UsersTable = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [filter, setFilter] = useState<string>('');
     const navigate = useNavigate();
@@ -33,9 +32,9 @@ const UsersTable = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-        const users = await fetchUsers();
-        setUsers(users);
-    };
+            const users = await fetchUsers();
+            setUsers(users);
+        };
 
         fetchData();
     }, []);
@@ -47,8 +46,9 @@ const UsersTable = () => {
     const filterUsers = () => {
         let newFilteredUsers = users;
         if (filter) {
-            newFilteredUsers = users.filter(user => user.email.includes(filter) || user.status.includes(filter) );
-        } setFilteredUsers(newFilteredUsers);
+            newFilteredUsers = users.filter(user => user.email.includes(filter) || user.status.includes(filter));
+        }
+        setFilteredUsers(newFilteredUsers);
     };
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,22 +59,22 @@ const UsersTable = () => {
         if (selectedUsers.length === users.length) {
             setSelectedUsers([]);
         } else {
-            setSelectedUsers(users.map(user => user.id));
+            setSelectedUsers(users.map(user => user.email));
         }
     };
 
-    const handleSelectUser = (id: number) => {
-        if (selectedUsers.includes(id)) {
-            setSelectedUsers(selectedUsers.filter(userId => userId !== id));
+    const handleSelectUser = (email: string) => {
+        if (selectedUsers.includes(email)) {
+            setSelectedUsers(selectedUsers.filter(userEmail => userEmail !== email));
         } else {
-            setSelectedUsers([...selectedUsers, id]);
+            setSelectedUsers([...selectedUsers, email]);
         }
     };
 
     const handleBlockUsers = async () => {
         try {
-            await axios.put('https://registration-and-authentication-1.onrender.com/users/block', { ids: selectedUsers });
-            const updatedUsers = users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'blocked' } : user);
+            await axios.put('https://registration-and-authentication-1.onrender.com/users/block', { emails: selectedUsers });
+            const updatedUsers = users.map(user => selectedUsers.includes(user.email) ? { ...user, status: 'blocked' } : user);
             setUsers(updatedUsers);
             setSelectedUsers([]);
 
@@ -91,8 +91,8 @@ const UsersTable = () => {
 
     const handleUnblockUsers = async () => {
         try {
-            await axios.put('https://registration-and-authentication-1.onrender.com/users/unblock', { ids: selectedUsers });
-            const updatedUsers = users.map(user => selectedUsers.includes(user.id) ? { ...user, status: 'active' } : user);
+            await axios.put('https://registration-and-authentication-1.onrender.com/users/unblock', { emails: selectedUsers });
+            const updatedUsers = users.map(user => selectedUsers.includes(user.email) ? { ...user, status: 'active' } : user);
             setUsers(updatedUsers);
             setSelectedUsers([]);
             localStorage.removeItem('allUsersBlocked');
@@ -103,8 +103,8 @@ const UsersTable = () => {
 
     const handleDeleteUsers = async () => {
         try {
-            await axios.delete('https://registration-and-authentication-1.onrender.com/users/delete', { data: { ids: selectedUsers } });
-            const updatedUsers = users.filter(user => !selectedUsers.includes(user.id));
+            await axios.delete('https://registration-and-authentication-1.onrender.com/users/delete', { data: { emails: selectedUsers } });
+            const updatedUsers = users.filter(user => !selectedUsers.includes(user.email));
             setUsers(updatedUsers);
             setSelectedUsers([]);
         } catch (err) {
@@ -118,13 +118,13 @@ const UsersTable = () => {
         navigate('/sign-in');
     };
 
-    const allSelectedBlocked = selectedUsers.every(userId => {
-        const user = users.find(user => user.id === userId);
+    const allSelectedBlocked = selectedUsers.every(userEmail => {
+        const user = users.find(user => user.email === userEmail);
         return user?.status === 'blocked';
     });
 
-    const allSelectedActive = selectedUsers.every(userId => {
-        const user = users.find(user => user.id === userId);
+    const allSelectedActive = selectedUsers.every(userEmail => {
+        const user = users.find(user => user.email === userEmail);
         return user?.status === 'active';
     });
 
@@ -148,37 +148,38 @@ const UsersTable = () => {
                     Delete
                 </Button>
             </ButtonGroup>
-            <Form.Group controlId="filter"> <Form.Label>Filter by Email or Status</Form.Label> <Form.Control type="text" placeholder="Enter email or status" value={filter} onChange={handleFilterChange} /> </Form.Group>
+            <Form.Group controlId="filter">
+                <Form.Label>Filter by Email or Status</Form.Label>
+                <Form.Control type="text" placeholder="Enter email or status" value={filter} onChange={handleFilterChange} />
+            </Form.Group>
             <Table striped bordered hover responsive className="table-primary">
                 <thead className="table-dark">
                     <tr>
                         <th>
-                        <Form.Check
-                            type="checkbox"
-                            onChange={handleSelectAll}
-                            checked={selectedUsers.length === users.length}
-                        />
+                            <Form.Check
+                                type="checkbox"
+                                onChange={handleSelectAll}
+                                checked={selectedUsers.length === users.length}
+                            />
                         </th>
-                        <th>ID</th>
-                        <th>Username</th>
                         <th>Email</th>
+                        <th>Username</th>
                         <th>Status</th>
                         <th>Last Login</th>
                     </tr>
                 </thead>
                 <tbody>
                     {filteredUsers.map(user => (
-                        <tr key={user.id} className={user.status === 'blocked' ? 'table-danger' : ''}>
+                        <tr key={user.email} className={user.status === 'blocked' ? 'table-danger' : ''}>
                             <td>
                                 <Form.Check
-                                type="checkbox"
-                                checked={selectedUsers.includes(user.id)}
-                                onChange={() => handleSelectUser(user.id)}
+                                    type="checkbox"
+                                    checked={selectedUsers.includes(user.email)}
+                                    onChange={() => handleSelectUser(user.email)}
                                 />
                             </td>
-                            <td>{user.id}</td>
-                            <td>{user.username}</td>
                             <td>{user.email}</td>
+                            <td>{user.username}</td>
                             <td>{user.status}</td>
                             <td>{new Date(user.last_login).toLocaleString()}</td>
                         </tr>
