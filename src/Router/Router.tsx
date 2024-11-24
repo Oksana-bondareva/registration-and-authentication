@@ -21,7 +21,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 const loader = async () => {
     const authToken = localStorage.getItem('authToken');
     const allUsersBlocked = localStorage.getItem('allUsersBlocked') === 'true';
-    if (authToken && !allUsersBlocked) {
+    const allUsersDeleted = localStorage.getItem('allUsersDeleted') === 'true';
+    if (authToken && !allUsersBlocked && !allUsersDeleted) {
         throw redirect('/main');
     }
     return null;

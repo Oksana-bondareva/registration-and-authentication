@@ -17,125 +17,129 @@ app.use(bodyParser());
 app.use(cors());
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 router.post('/sign-up', async (ctx: Context) => {
-  const { username, email, password } = ctx.request.body as { username: string, email: string, password: string };
-  if (!username || !email || !password) {
-    ctx.status = 400;
-    ctx.body = 'All fields are required';
-    return;
-  }
+    const { username, email, password } = ctx.request.body as { username: string, email: string, password: string };
+    if (!username || !email || !password) {
+        ctx.status = 400;
+        ctx.body = 'All fields are required';
+        return;
+    }
 
-  try {
-    console.log('Received data:', { username, email, password });
-    const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+        console.log('Received data:', { username, email, password });
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.query(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username, email, hashedPassword]
-    );
-    ctx.status = 201;
-    ctx.body = 'User registered successfully';
-  } catch (err) {
-    console.error('Error registering user:', err);
-    ctx.status = 500;
-    ctx.body = 'Error registering user';
-  }
+        await db.query(
+        'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+        [username, email, hashedPassword]
+        );
+        ctx.status = 201;
+        ctx.body = 'User registered successfully';
+    } catch (err) {
+        console.error('Error registering user:', err);
+        ctx.status = 500;
+        ctx.body = 'Error registering user';
+    }
 });
 
 router.post('/sign-in', async (ctx: Context) => {
-  const { email, password } = ctx.request.body as { email: string, password: string };
-  if (!email || !password) {
-    ctx.status = 400;
-    ctx.body = 'All fields are required';
-    return;
-  }
-
-  try {
-    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    const user = (rows as any[])[0];
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      ctx.status = 401;
-      ctx.body = 'Invalid email or password';
-      return;
+    const { email, password } = ctx.request.body as { email: string, password: string };
+    if (!email || !password) {
+        ctx.status = 400;
+        ctx.body = 'All fields are required';
+        return;
     }
 
-    if (user.status === 'blocked') {
-      ctx.status = 403;
-      ctx.body = 'Your account has been blocked';
-      return;
-    }
+    try {
+        const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        const user = (rows as any[])[0];
 
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
-    ctx.status = 200;
-    ctx.body = { token };
-  } catch (err) {
-    console.error('Error signing in:', err);
-    ctx.status = 500;
-    ctx.body = 'Error signing in';
-  }
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            ctx.status = 401;
+            ctx.body = 'Invalid email or password';
+            return;
+        }
+
+        if (user.status === 'blocked') {
+            ctx.status = 403;
+            ctx.body = 'Your account has been blocked';
+            return;
+        }
+
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' });
+        ctx.status = 200;
+        ctx.body = { token };
+    } catch (err) {
+        console.error('Error signing in:', err);
+        ctx.status = 500;
+        ctx.body = 'Error signing in';
+    }
 });
 
 router.get('/users', async (ctx: Context) => {
-  try {
-    const [rows] = await db.query('SELECT username, email, status, last_login FROM users');
-    ctx.body = rows;
-  } catch (err) {
-    console.error('Error fetching users:', err);
-    ctx.status = 500;
-    ctx.body = 'Error fetching users';
-  }
+    try {
+        const [rows] = await db.query('SELECT username, email, status, last_login FROM users');
+        ctx.body = rows;
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        ctx.status = 500;
+        ctx.body = 'Error fetching users';
+    }
 });
 
 router.put('/users/block', async (ctx: Context) => {
-  const { emails } = ctx.request.body as { emails: string[] };
-  try {
-    await db.query('UPDATE users SET status = ? WHERE email IN (?)', ['blocked', emails]);
-    ctx.status = 200;
-    ctx.body = 'Users blocked successfully';
-  } catch (err) {
-    console.error('Error blocking users:', err);
-    ctx.status = 500;
-    ctx.body = 'Error blocking users';
-  }
+    const { emails } = ctx.request.body as { emails: string[] };
+    try {
+        await db.query('UPDATE users SET status = ? WHERE email IN (?)', ['blocked', emails]);
+        ctx.status = 200;
+        ctx.body = 'Users blocked successfully';
+    } catch (err) {
+        console.error('Error blocking users:', err);
+        ctx.status = 500;
+        ctx.body = 'Error blocking users';
+    }
 });
 
 router.put('/users/unblock', async (ctx: Context) => {
-  const { emails } = ctx.request.body as { emails: string[] };
-  try {
-    await db.query('UPDATE users SET status = ? WHERE email IN (?)', ['active', emails]);
-    ctx.status = 200;
-    ctx.body = 'Users unblocked successfully';
-  } catch (err) {
-    console.error('Error unblocking users:', err);
-    ctx.status = 500;
-    ctx.body = 'Error unblocking users';
-  }
+    const { emails } = ctx.request.body as { emails: string[] };
+    try {
+        await db.query('UPDATE users SET status = ? WHERE email IN (?)', ['active', emails]);
+        ctx.status = 200;
+        ctx.body = 'Users unblocked successfully';
+    } catch (err) {
+        console.error('Error unblocking users:', err);
+        ctx.status = 500;
+        ctx.body = 'Error unblocking users';
+    }
 });
 
 router.delete('/users/delete', async (ctx: Context) => {
-  const { emails } = ctx.request.body as { emails: string[] };
-  try {
-    await db.query('DELETE FROM users WHERE email IN (?)', [emails]);
-    ctx.status = 200;
-    ctx.body = 'Users deleted successfully';
-  } catch (err) {
-    console.error('Error deleting users:', err);
-    ctx.status = 500;
-    ctx.body = 'Error deleting users';
-  }
+    const { emails } = ctx.request.body as { emails: string[] };
+    try {
+        await db.query('DELETE FROM users WHERE email IN (?)', [emails]);
+
+        const [remainingUsers] = await db.query('SELECT COUNT(*) as count FROM users');
+        const count = (remainingUsers as any[])[0].count;
+
+        ctx.status = 200;
+        ctx.body = { message: 'Users deleted successfully', allUsersDeleted: count === 0 };
+    } catch (err) {
+        console.error('Error deleting users:', err);
+        ctx.status = 500;
+        ctx.body = 'Error deleting users';
+    }
 });
 
 app
-  .use(router.routes())
-  .use(router.allowedMethods());
+    .use(router.routes())
+    .use(router.allowedMethods());
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });

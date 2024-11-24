@@ -26,7 +26,17 @@ const SignInForm = () => {
             if (!err.response) {
                 toast.error('No connection to the server. Please try again later.');
             }
-            toast.error('Error authentication user. Please enter the correct email and password.');
+
+            const errorMessage = err.response.data || 'Error authentication user. Please enter the correct email and password.';
+            
+            if (err.response.status === 403 && errorMessage.includes('blocked')) {
+                toast.error('Your account has been blocked.'); 
+                localStorage.setItem('allUsersBlocked', 'true');
+            } else if (err.response.status === 401) {
+                toast.error('Invalid email or password. Please try again.');
+            } else {
+                toast.error(errorMessage);
+            }
         }
     };
 

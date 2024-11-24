@@ -103,10 +103,22 @@ const UsersTable = () => {
 
     const handleDeleteUsers = async () => {
         try {
-            await axios.delete('https://registration-and-authentication-1.onrender.com/users/delete', { data: { emails: selectedUsers } });
+            const response = await axios.delete('https://registration-and-authentication-1.onrender.com/users/delete', { data: { emails: selectedUsers } });
             const updatedUsers = users.filter(user => !selectedUsers.includes(user.email));
             setUsers(updatedUsers);
             setSelectedUsers([]);
+
+            if (response.data.allUsersDeleted) {
+                toast.success('All users deleted. Redirecting to login page...');
+                localStorage.setItem('allUsersDeleted', 'true');
+                setTimeout(() => {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('allUsersBlocked');
+                    navigate('/sign-in');
+                }, 1000);
+            } else {
+                    toast.success('Users deleted successfully');
+            }
         } catch (err) {
             toast.error('Error deleting users');
         }
