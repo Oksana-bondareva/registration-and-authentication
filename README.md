@@ -1,5 +1,7 @@
 # Registration and Authentication System
 
+# Deploy: https://dashing-axolotl-aac090.netlify.app/sign-in
+
 ## Overview
 
 This project is a comprehensive registration and authentication system built using modern web technologies. It is designed to provide a secure and user-friendly interface for users to sign up, log in, and manage their accounts. The system includes features such as user registration, login, account blocking/unblocking, and deletion, with robust error handling and visual feedback using toast notifications.
